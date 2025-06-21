@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'screens/home_screen.dart';
 import 'screens/peternakan_screen.dart';
-// import 'screens/pertanian_screen.dart';
 import 'screens/profile_screen.dart';
-import 'login_screen.dart'; // ✅ Tambahkan ini
+import 'login_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,7 +20,7 @@ class AgroApp extends StatelessWidget {
       title: 'Agro App',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(primarySwatch: Colors.green),
-      home: const LoginScreen(), // ✅ Awali dengan LoginScreen
+      home: const LoginScreen(),
     );
   }
 }
@@ -39,7 +38,6 @@ class _MainNavigationState extends State<MainNavigation> {
   final List<Widget> _screens = [
     const HomeScreen(),
     const PeternakanScreen(),
-    // const PertanianScreen(),
     const ProfileScreen(),
   ];
 

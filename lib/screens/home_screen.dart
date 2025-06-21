@@ -16,6 +16,47 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Map<String, dynamic>> _news = [];
   bool _loadingWeather = true, _loadingNews = true;
 
+  // Dummy data for livestock summary
+  final Map<String, int> _livestockSummary = {
+    'Sapi': 42,
+    'Ayam': 120,
+    'Kambing': 28,
+    'Bebek': 65,
+    'Domba': 18,
+  };
+
+  // Dummy data for today's activities
+  final List<Map<String, dynamic>> _todayActivities = [
+    {
+      'type': 'pakan',
+      'title': 'Pemberian Pakan',
+      'time': '08:00',
+      'status': 'completed',
+      'description': 'Pakan untuk semua hewan ternak',
+    },
+    {
+      'type': 'vaksin',
+      'title': 'Vaksinasi Sapi',
+      'time': '10:30',
+      'status': 'in-progress',
+      'description': 'Vaksin untuk sapi dewasa',
+    },
+    {
+      'type': 'panen',
+      'title': 'Panen Telur Ayam',
+      'time': '14:00',
+      'status': 'pending',
+      'description': 'Panen telur dari kandang A dan B',
+    },
+    {
+      'type': 'pemeriksaan',
+      'title': 'Pemeriksaan Kesehatan',
+      'time': '16:00',
+      'status': 'pending',
+      'description': 'Pemeriksaan kambing dan domba',
+    },
+  ];
+
   @override
   void initState() {
     super.initState();
@@ -45,6 +86,252 @@ class _HomeScreenState extends State<HomeScreen> {
       setState(() => _news = []);
     } finally {
       setState(() => _loadingNews = false);
+    }
+  }
+
+  Widget _buildLivestockSummaryCard() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            blurRadius: 10,
+            spreadRadius: 2,
+          ),
+        ],
+      ),
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Ringkasan Hewan Ternak',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey[800],
+                ),
+              ),
+              Icon(Icons.pets, color: Colors.brown[700]),
+            ],
+          ),
+          const SizedBox(height: 16),
+          GridView.count(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            crossAxisCount: 3,
+            childAspectRatio: 1.2,
+            mainAxisSpacing: 12,
+            crossAxisSpacing: 12,
+            children: _livestockSummary.entries.map((entry) {
+              return Container(
+                decoration: BoxDecoration(
+                  color: Colors.brown[50],
+                  borderRadius: BorderRadius.circular(15),
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      entry.value.toString(),
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.brown[800],
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      entry.key,
+                      style: TextStyle(fontSize: 14, color: Colors.brown[600]),
+                    ),
+                  ],
+                ),
+              );
+            }).toList(),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildActivityStatusCard() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.grey.withOpacity(0.1),
+            blurRadius: 10,
+            spreadRadius: 2,
+          ),
+        ],
+      ),
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Text(
+                'Status Aktivitas Hari Ini',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.grey[800],
+                ),
+              ),
+              Icon(Icons.schedule, color: Colors.brown[700]),
+            ],
+          ),
+          const SizedBox(height: 16),
+          ..._todayActivities.map((activity) {
+            Color statusColor = Colors.grey;
+            IconData statusIcon = Icons.access_time;
+
+            switch (activity['status']) {
+              case 'completed':
+                statusColor = Colors.green;
+                statusIcon = Icons.check_circle;
+                break;
+              case 'in-progress':
+                statusColor = Colors.orange;
+                statusIcon = Icons.autorenew;
+                break;
+              case 'pending':
+                statusColor = Colors.blue;
+                statusIcon = Icons.pending;
+                break;
+            }
+
+            return Container(
+              margin: const EdgeInsets.only(bottom: 16),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.grey[50],
+                borderRadius: BorderRadius.circular(15),
+                border: Border.all(color: Colors.grey[200]!),
+              ),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: _getActivityColor(
+                        activity['type'],
+                      ).withOpacity(0.1),
+                      shape: BoxShape.circle,
+                    ),
+                    child: Icon(
+                      _getActivityIcon(activity['type']),
+                      color: _getActivityColor(activity['type']),
+                      size: 24,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          activity['title'],
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                            color: Colors.grey[800],
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          activity['description'],
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      Text(
+                        activity['time'],
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.grey[800],
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      Row(
+                        children: [
+                          Icon(statusIcon, color: statusColor, size: 20),
+                          const SizedBox(width: 4),
+                          Text(
+                            _getStatusText(activity['status']),
+                            style: TextStyle(
+                              fontSize: 13,
+                              fontWeight: FontWeight.w500,
+                              color: statusColor,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            );
+          }).toList(),
+        ],
+      ),
+    );
+  }
+
+  Color _getActivityColor(String type) {
+    switch (type) {
+      case 'pakan':
+        return Colors.orange;
+      case 'vaksin':
+        return Colors.blue;
+      case 'panen':
+        return Colors.green;
+      default:
+        return Colors.purple;
+    }
+  }
+
+  IconData _getActivityIcon(String type) {
+    switch (type) {
+      case 'pakan':
+        return Icons.restaurant;
+      case 'vaksin':
+        return Icons.medical_services;
+      case 'panen':
+        return Icons.agriculture;
+      default:
+        return Icons.assignment;
+    }
+  }
+
+  String _getStatusText(String status) {
+    switch (status) {
+      case 'completed':
+        return 'Selesai';
+      case 'in-progress':
+        return 'Proses';
+      case 'pending':
+        return 'Menunggu';
+      default:
+        return '';
     }
   }
 
@@ -282,6 +569,16 @@ class _HomeScreenState extends State<HomeScreen> {
                 ],
               ),
             ),
+
+            // Livestock Summary Card
+            _buildLivestockSummaryCard(),
+
+            const SizedBox(height: 20),
+
+            // Activity Status Card
+            _buildActivityStatusCard(),
+
+            const SizedBox(height: 20),
 
             // Weather Card
             _buildWeatherCard(),
