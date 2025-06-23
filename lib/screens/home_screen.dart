@@ -16,7 +16,6 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Map<String, dynamic>> _news = [];
   bool _loadingWeather = true, _loadingNews = true;
 
-  // Dummy data for tips peternakan
   final List<Map<String, dynamic>> _livestockTips = [
     {
       'icon': Icons.water_drop,
@@ -573,10 +572,10 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'PeternakanKu',
+          'Beranda',
           style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20),
         ),
-        backgroundColor: Colors.brown[700],
+        // backgroundColor: Colors.brown[700],
         elevation: 0,
         centerTitle: false,
         actions: [],
