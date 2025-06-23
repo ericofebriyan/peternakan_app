@@ -62,35 +62,52 @@ class _HomeScreenState extends State<HomeScreen> {
     },
   ];
 
-  // Dummy data for today's activities
-  final List<Map<String, dynamic>> _todayActivities = [
+  // BARU: Data harga pasar hewan ternak (menggantikan aktivitas hari ini)
+  final List<Map<String, dynamic>> _marketPrices = [
     {
-      'type': 'pakan',
-      'title': 'Pemberian Pakan',
-      'time': '08:00',
-      'status': 'completed',
-      'description': 'Pakan untuk semua hewan ternak',
+      'animal': 'Sapi Potong',
+      'price': 65000,
+      'unit': 'per kg',
+      'trend': 'up', // 'up', 'down', 'stable'
+      'change': 2500,
+      'icon': Icons.agriculture,
+      'color': Colors.brown,
     },
     {
-      'type': 'vaksin',
-      'title': 'Vaksinasi Sapi',
-      'time': '10:30',
-      'status': 'in-progress',
-      'description': 'Vaksin untuk sapi dewasa',
+      'animal': 'Ayam Broiler',
+      'price': 35000,
+      'unit': 'per ekor',
+      'trend': 'stable',
+      'change': 0,
+      'icon': Icons.egg_alt,
+      'color': Colors.amber,
     },
     {
-      'type': 'panen',
-      'title': 'Panen Telur Ayam',
-      'time': '14:00',
-      'status': 'pending',
-      'description': 'Panen telur dari kandang A dan B',
+      'animal': 'Kambing',
+      'price': 125000,
+      'unit': 'per kg',
+      'trend': 'up',
+      'change': 5000,
+      'icon': Icons.pets,
+      'color': Colors.green,
     },
     {
-      'type': 'pemeriksaan',
-      'title': 'Pemeriksaan Kesehatan',
-      'time': '16:00',
-      'status': 'pending',
-      'description': 'Pemeriksaan kambing dan domba',
+      'animal': 'Bebek',
+      'price': 45000,
+      'unit': 'per ekor',
+      'trend': 'down',
+      'change': 3000,
+      'icon': Icons.water,
+      'color': Colors.blue,
+    },
+    {
+      'animal': 'Domba',
+      'price': 110000,
+      'unit': 'per kg',
+      'trend': 'up',
+      'change': 3500,
+      'icon': Icons.grass,
+      'color': Colors.grey,
     },
   ];
 
@@ -106,7 +123,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> fetchWeather() async {
     try {
-      final data = await WeatherService.getWeather('Jakarta');
+      final data = await WeatherService.getWeather('jawa timur');
       setState(() => _weatherData = data);
     } catch (_) {
       setState(() => _weatherData = null);
@@ -126,7 +143,6 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  // WIDGET BARU: Tips Peternakan (menggantikan ringkasan hewan ternak)
   Widget _buildLivestockTipsCard() {
     return Container(
       decoration: BoxDecoration(
@@ -160,7 +176,7 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
           const SizedBox(height: 16),
           SizedBox(
-            height: 200, // Tinggi tetap untuk scroll vertikal
+            height: 200,
             child: ListView(
               physics: const BouncingScrollPhysics(),
               children: _livestockTips.map((tip) {
@@ -222,7 +238,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildActivityStatusCard() {
+  Widget _buildMarketPricesCard() {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -243,33 +259,37 @@ class _HomeScreenState extends State<HomeScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Status Aktivitas Hari Ini',
+                'Harga Pasar Peternakan',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                   color: Colors.grey[800],
                 ),
               ),
-              Icon(Icons.schedule, color: Colors.brown[700]),
+              Icon(Icons.bar_chart, color: Colors.green[700]),
             ],
           ),
           const SizedBox(height: 16),
-          ..._todayActivities.map((activity) {
-            Color statusColor = Colors.grey;
-            IconData statusIcon = Icons.access_time;
+          ..._marketPrices.map((priceData) {
+            Color trendColor = Colors.grey;
+            IconData trendIcon = Icons.arrow_right;
+            String trendText = 'Stabil';
 
-            switch (activity['status']) {
-              case 'completed':
-                statusColor = Colors.green;
-                statusIcon = Icons.check_circle;
+            switch (priceData['trend']) {
+              case 'up':
+                trendColor = Colors.green;
+                trendIcon = Icons.arrow_upward;
+                trendText = 'Naik';
                 break;
-              case 'in-progress':
-                statusColor = Colors.orange;
-                statusIcon = Icons.autorenew;
+              case 'down':
+                trendColor = Colors.red;
+                trendIcon = Icons.arrow_downward;
+                trendText = 'Turun';
                 break;
-              case 'pending':
-                statusColor = Colors.blue;
-                statusIcon = Icons.pending;
+              case 'stable':
+                trendColor = Colors.grey;
+                trendIcon = Icons.arrow_right;
+                trendText = 'Stabil';
                 break;
             }
 
@@ -286,14 +306,12 @@ class _HomeScreenState extends State<HomeScreen> {
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: _getActivityColor(
-                        activity['type'],
-                      ).withOpacity(0.1),
+                      color: priceData['color'].withOpacity(0.1),
                       shape: BoxShape.circle,
                     ),
                     child: Icon(
-                      _getActivityIcon(activity['type']),
-                      color: _getActivityColor(activity['type']),
+                      priceData['icon'],
+                      color: priceData['color'],
                       size: 24,
                     ),
                   ),
@@ -303,7 +321,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          activity['title'],
+                          priceData['animal'],
                           style: TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
@@ -312,7 +330,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          activity['description'],
+                          '${NumberFormat.currency(locale: 'id', symbol: 'Rp ', decimalDigits: 0).format(priceData['price'])} ${priceData['unit']}',
                           style: TextStyle(
                             fontSize: 14,
                             color: Colors.grey[600],
@@ -324,29 +342,30 @@ class _HomeScreenState extends State<HomeScreen> {
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      Text(
-                        activity['time'],
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.grey[800],
-                        ),
-                      ),
-                      const SizedBox(height: 8),
                       Row(
                         children: [
-                          Icon(statusIcon, color: statusColor, size: 20),
+                          Icon(trendIcon, color: trendColor, size: 20),
                           const SizedBox(width: 4),
                           Text(
-                            _getStatusText(activity['status']),
+                            trendText,
                             style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w500,
-                              color: statusColor,
+                              color: trendColor,
                             ),
                           ),
                         ],
                       ),
+                      const SizedBox(height: 8),
+                      if (priceData['change'] != 0)
+                        Text(
+                          '${priceData['trend'] == 'down' ? '-' : '+'}${NumberFormat.currency(locale: 'id', symbol: 'Rp ', decimalDigits: 0).format(priceData['change'])}',
+                          style: TextStyle(
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                            color: trendColor,
+                          ),
+                        ),
                     ],
                   ),
                 ],
@@ -356,45 +375,6 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
     );
-  }
-
-  Color _getActivityColor(String type) {
-    switch (type) {
-      case 'pakan':
-        return Colors.orange;
-      case 'vaksin':
-        return Colors.blue;
-      case 'panen':
-        return Colors.green;
-      default:
-        return Colors.purple;
-    }
-  }
-
-  IconData _getActivityIcon(String type) {
-    switch (type) {
-      case 'pakan':
-        return Icons.restaurant;
-      case 'vaksin':
-        return Icons.medical_services;
-      case 'panen':
-        return Icons.agriculture;
-      default:
-        return Icons.assignment;
-    }
-  }
-
-  String _getStatusText(String status) {
-    switch (status) {
-      case 'completed':
-        return 'Selesai';
-      case 'in-progress':
-        return 'Proses';
-      case 'pending':
-        return 'Menunggu';
-      default:
-        return '';
-    }
   }
 
   Widget _buildWeatherCard() {
@@ -599,9 +579,7 @@ class _HomeScreenState extends State<HomeScreen> {
         backgroundColor: Colors.brown[700],
         elevation: 0,
         centerTitle: false,
-        actions: [
-          // IconButton(icon: const Icon(Icons.notifications), onPressed: () {}),
-        ],
+        actions: [],
       ),
       body: SingleChildScrollView(
         physics: const BouncingScrollPhysics(),
@@ -632,22 +610,18 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
 
-            // TIPS PETERNAKAN BARU (menggantikan ringkasan hewan ternak)
             _buildLivestockTipsCard(),
 
             const SizedBox(height: 20),
 
-            // Activity Status Card
-            _buildActivityStatusCard(),
+            _buildMarketPricesCard(),
 
             const SizedBox(height: 20),
 
-            // Weather Card
             _buildWeatherCard(),
 
             const SizedBox(height: 24),
 
-            // Section Header Berita
             Padding(
               padding: const EdgeInsets.only(bottom: 16),
               child: Row(
@@ -680,7 +654,6 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
 
-            // News Cards
             if (_loadingNews)
               const Center(child: CircularProgressIndicator())
             else if (_news.isEmpty)
