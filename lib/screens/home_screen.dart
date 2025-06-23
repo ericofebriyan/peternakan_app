@@ -16,14 +16,51 @@ class _HomeScreenState extends State<HomeScreen> {
   List<Map<String, dynamic>> _news = [];
   bool _loadingWeather = true, _loadingNews = true;
 
-  // Dummy data for livestock summary
-  final Map<String, int> _livestockSummary = {
-    'Sapi': 42,
-    'Ayam': 120,
-    'Kambing': 28,
-    'Bebek': 65,
-    'Domba': 18,
-  };
+  // Dummy data for tips peternakan
+  final List<Map<String, dynamic>> _livestockTips = [
+    {
+      'icon': Icons.water_drop,
+      'title': 'Hidrasi Hewan',
+      'description':
+          'Pastikan hewan ternak selalu memiliki akses air bersih. Ganti air minum minimal 2 kali sehari saat cuaca panas.',
+      'color': Colors.blue,
+    },
+    {
+      'icon': Icons.medical_services,
+      'title': 'Vaksinasi Rutin',
+      'description':
+          'Lakukan vaksinasi sesuai jadwal untuk semua jenis ternak. Konsultasikan dengan dokter hewan untuk jadwal yang tepat.',
+      'color': Colors.green,
+    },
+    {
+      'icon': Icons.food_bank,
+      'title': 'Pakan Berkualitas',
+      'description':
+          'Berikan pakan dengan nutrisi seimbang sesuai jenis ternak. Tambahkan suplemen vitamin selama musim hujan.',
+      'color': Colors.orange,
+    },
+    {
+      'icon': Icons.clean_hands,
+      'title': 'Kebersihan Kandang',
+      'description':
+          'Bersihkan kandang secara rutin untuk mencegah penyakit. Gunakan desinfektan alami seperti kapur untuk lantai kandang.',
+      'color': Colors.brown,
+    },
+    {
+      'icon': Icons.thermostat,
+      'title': 'Pengendalian Suhu',
+      'description':
+          'Sediakan tempat teduh untuk ternak saat cuaca panas. Gunakan alas jerami untuk menghangatkan kandang saat malam dingin.',
+      'color': Colors.red,
+    },
+    {
+      'icon': Icons.health_and_safety,
+      'title': 'Pemantauan Kesehatan',
+      'description':
+          'Periksa kondisi hewan setiap hari. Segera isolasi hewan yang menunjukkan gejala sakit.',
+      'color': Colors.purple,
+    },
+  ];
 
   // Dummy data for today's activities
   final List<Map<String, dynamic>> _todayActivities = [
@@ -89,7 +126,8 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  Widget _buildLivestockSummaryCard() {
+  // WIDGET BARU: Tips Peternakan (menggantikan ringkasan hewan ternak)
+  Widget _buildLivestockTipsCard() {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
@@ -110,50 +148,74 @@ class _HomeScreenState extends State<HomeScreen> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Ringkasan Hewan Ternak',
+                'Tips Peternakan',
                 style: TextStyle(
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                   color: Colors.grey[800],
                 ),
               ),
-              Icon(Icons.pets, color: Colors.brown[700]),
+              Icon(Icons.lightbulb, color: Colors.amber[700]),
             ],
           ),
           const SizedBox(height: 16),
-          GridView.count(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            crossAxisCount: 3,
-            childAspectRatio: 1.2,
-            mainAxisSpacing: 12,
-            crossAxisSpacing: 12,
-            children: _livestockSummary.entries.map((entry) {
-              return Container(
-                decoration: BoxDecoration(
-                  color: Colors.brown[50],
-                  borderRadius: BorderRadius.circular(15),
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      entry.value.toString(),
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.brown[800],
+          SizedBox(
+            height: 200, // Tinggi tetap untuk scroll vertikal
+            child: ListView(
+              physics: const BouncingScrollPhysics(),
+              children: _livestockTips.map((tip) {
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 12),
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: tip['color'].withOpacity(0.05),
+                    borderRadius: BorderRadius.circular(15),
+                    border: Border.all(
+                      color: tip['color'].withOpacity(0.2),
+                      width: 1.5,
+                    ),
+                  ),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: tip['color'].withOpacity(0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(tip['icon'], color: tip['color'], size: 24),
                       ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      entry.key,
-                      style: TextStyle(fontSize: 14, color: Colors.brown[600]),
-                    ),
-                  ],
-                ),
-              );
-            }).toList(),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              tip['title'],
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.grey[800],
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              tip['description'],
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.grey[600],
+                                height: 1.4,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }).toList(),
+            ),
           ),
         ],
       ),
@@ -570,8 +632,8 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
 
-            // Livestock Summary Card
-            _buildLivestockSummaryCard(),
+            // TIPS PETERNAKAN BARU (menggantikan ringkasan hewan ternak)
+            _buildLivestockTipsCard(),
 
             const SizedBox(height: 20),
 
